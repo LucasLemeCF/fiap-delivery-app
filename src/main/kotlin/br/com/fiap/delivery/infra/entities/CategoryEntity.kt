@@ -17,10 +17,10 @@ data class CategoryEntity(
     @Column(name = "IDT_CATEGORY")
     var id: Long?,
 
-    @Column(name = "NAM_CATEGORY")
+    @Column(name = "NAM_CATEGORY", unique = true)
     val name: String,
 
-    @OneToMany(mappedBy = TABLE_NAME, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     val products: List<ProductEntity>,
 
 ) {

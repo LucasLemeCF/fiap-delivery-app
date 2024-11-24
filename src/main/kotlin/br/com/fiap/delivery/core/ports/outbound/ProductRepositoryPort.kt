@@ -4,6 +4,8 @@ import br.com.fiap.delivery.core.domain.ProductDomain
 
 interface ProductRepositoryPort {
 
-    fun findProduct(productName: String): ProductDomain
+    fun searchProduct(productName: String): ProductDomain
+    fun create(productDomain: ProductDomain): ProductDomain
+    fun searchAll(): List<ProductDomain>
 
 }

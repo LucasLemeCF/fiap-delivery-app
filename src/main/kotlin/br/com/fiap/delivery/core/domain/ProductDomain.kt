@@ -8,7 +8,11 @@ data class ProductDomain(
     val name: String,
     val description: String,
     val value: BigDecimal = BigDecimal.ZERO,
-    val category: CategoryDomain,
+    var category: CategoryDomain,
     val isActive: Boolean = true,
 
-)
+) {
+    fun updateCategory(category: CategoryDomain) {
+        this.category = category
+    }
+}

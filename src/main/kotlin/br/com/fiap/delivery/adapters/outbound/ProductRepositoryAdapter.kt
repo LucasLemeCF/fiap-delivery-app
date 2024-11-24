@@ -12,10 +12,24 @@ class ProductRepositoryAdapter(
     val productRepository: ProductRepository
 ): ProductRepositoryPort {
 
-    override fun findProduct(productName: String): ProductDomain {
+    override fun searchProduct(productName: String): ProductDomain {
         return productRepository.findByName(productName)?.let {
             ProductMapper.toDomain(it)
         } ?: throw NotFoundException("product $productName not found in system!")
+    }
+
+    override fun create(productDomain: ProductDomain): ProductDomain {
+        return ProductMapper.toDomain(
+            productRepository.save(
+                ProductMapper.toEntity(productDomain)
+            )
+        )
+    }
+
+    override fun searchAll(): List<ProductDomain> {
+        return productRepository.findAll().map {
+            ProductMapper.toDomain(it)
+        }
     }
 
 }

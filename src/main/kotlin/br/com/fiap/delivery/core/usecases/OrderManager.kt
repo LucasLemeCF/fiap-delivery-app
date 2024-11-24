@@ -41,25 +41,39 @@ class OrderManager(
         return orderRepositoryPort.createOrder(orderDomain)
     }
 
+    override fun getOrderBy(id: Long): CompleteOrderDomain {
+        val order = orderRepositoryPort.searchBy(id)
+        val products = orderProductRepositoryPort.findAllBy(order).map {
+            it.product
+        }
+
+        return CompleteOrderDomain(
+            order = order,
+            products = products
+        )
+    }
+
     private fun calculateAndSaveItems(
         orderFlatDomain: OrderFlatDomain,
         products: List<ProductDomain>,
         orderDomain: OrderDomain
     ) {
-        val items: List<OrderProductDomain> = mutableListOf()
-        val totalValue: BigDecimal = BigDecimal.ZERO
+        val items: MutableList<OrderProductDomain> = mutableListOf()
+        var totalValue: BigDecimal = BigDecimal.ZERO
 
         orderFlatDomain.products.forEach { product ->
             val productDomain = products.find { it.name == product.productName }
 
-            val orderProductDomain = OrderProductDomain(
-                id = null,
-                order = orderDomain,
-                product = productDomain!!
-            )
+            for (i in 1..product.quantity) {
+                val orderProductDomain = OrderProductDomain(
+                    id = null,
+                    order = orderDomain,
+                    product = productDomain!!
+                )
 
-            items.plus(orderProductDomain)
-            totalValue.plus(productDomain.value)
+                items.add(orderProductDomain)
+                totalValue += productDomain.value
+            }
         }
 
         orderProductRepositoryPort.createAll(items)
@@ -68,7 +82,7 @@ class OrderManager(
 
     fun checkAndGetProducts(products: List<ProductFlatDomain>): List<ProductDomain> {
         val uniqueProducts = products.distinctBy { it.productName }.toSet()
-        return uniqueProducts.map { productPort.getProduct(it.productName) }
+        return uniqueProducts.map { productPort.searchProduct(it.productName) }
     }
 
 }
