@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: fiap-delivery-app
+
+  profiles:
+    active: ${PROFILE:dev}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          lab:
+            non_contextual_creation: true
+
+server:
+  servlet:
+    context-path: /api
+
+  port: ${APPLICATION_PORT:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prd
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+
