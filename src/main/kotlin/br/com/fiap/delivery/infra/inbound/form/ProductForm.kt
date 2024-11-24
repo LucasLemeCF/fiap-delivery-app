@@ -1,4 +1,4 @@
-package br.com.fiap.delivery.adapters.inbound.form
+package br.com.fiap.delivery.infra.inbound.form
 
 import java.math.BigDecimal
 

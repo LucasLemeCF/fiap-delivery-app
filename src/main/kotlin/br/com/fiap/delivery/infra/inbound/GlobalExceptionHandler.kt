@@ -1,4 +1,4 @@
-package br.com.fiap.delivery.adapters.inbound
+package br.com.fiap.delivery.infra.inbound
 
 import br.com.fiap.delivery.core.domain.exceptions.NotFoundException
 import br.com.fiap.delivery.infra.GlobalException

@@ -1,6 +1,6 @@
-package br.com.fiap.delivery.adapters.inbound
+package br.com.fiap.delivery.infra.inbound
 
-import br.com.fiap.delivery.adapters.inbound.form.CategoryForm
+import br.com.fiap.delivery.infra.inbound.form.CategoryForm
 import br.com.fiap.delivery.core.domain.CategoryDomain
 import br.com.fiap.delivery.core.ports.inbound.CategoryPort
 import br.com.fiap.delivery.infra.mappers.CategoryMapper

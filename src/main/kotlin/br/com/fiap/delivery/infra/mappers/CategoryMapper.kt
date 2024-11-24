@@ -1,6 +1,6 @@
 package br.com.fiap.delivery.infra.mappers
 
-import br.com.fiap.delivery.adapters.inbound.form.CategoryForm
+import br.com.fiap.delivery.infra.inbound.form.CategoryForm
 import br.com.fiap.delivery.core.domain.CategoryDomain
 import br.com.fiap.delivery.infra.entities.CategoryEntity
 

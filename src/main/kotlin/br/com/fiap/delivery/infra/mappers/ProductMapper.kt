@@ -1,6 +1,6 @@
 package br.com.fiap.delivery.infra.mappers
 
-import br.com.fiap.delivery.adapters.inbound.form.ProductForm
+import br.com.fiap.delivery.infra.inbound.form.ProductForm
 import br.com.fiap.delivery.core.domain.ProductDomain
 import br.com.fiap.delivery.infra.entities.ProductEntity
 
