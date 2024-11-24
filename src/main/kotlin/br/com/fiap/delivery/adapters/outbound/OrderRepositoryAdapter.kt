@@ -26,4 +26,12 @@ class OrderRepositoryAdapter(
         }.orElseThrow { throw NotFoundException("not found order id=$id in system!") }
     }
 
+    override fun update(order: OrderDomain): OrderDomain {
+        return OrderMapper.toDomain(
+            orderRepository.save(
+                OrderMapper.toEntity(order)
+            )
+        )
+    }
+
 }

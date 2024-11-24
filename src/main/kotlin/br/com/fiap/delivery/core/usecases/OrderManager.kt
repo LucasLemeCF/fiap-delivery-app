@@ -53,6 +53,14 @@ class OrderManager(
         )
     }
 
+    override fun searchOrder(id: Long): OrderDomain {
+        return orderRepositoryPort.searchBy(id)
+    }
+
+    override fun updateOrder(orderDomain: OrderDomain): OrderDomain {
+        return orderRepositoryPort.update(orderDomain)
+    }
+
     private fun calculateAndSaveItems(
         orderFlatDomain: OrderFlatDomain,
         products: List<ProductDomain>,
