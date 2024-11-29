@@ -4,7 +4,9 @@ plugins {
 	id("org.springframework.boot") version "3.4.0"
 	id("io.spring.dependency-management") version "1.1.6"
 	kotlin("plugin.jpa") version "1.9.25"
+	id("org.gradle.jacoco")
 }
+
 
 group = "br.com.fiap"
 version = "0.0.1-SNAPSHOT"
@@ -46,4 +48,36 @@ allOpen {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
+tasks.jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+	}
+}
+
+tasks.withType<JacocoReport> {
+	afterEvaluate {
+		classDirectories.setFrom(classDirectories.files.map {
+			fileTree(it).matching {
+				exclude("**/delivery/infra/entities/**")
+				exclude("**/delivery/infra/mappers/**")
+			}
+		})
+	}
 }
