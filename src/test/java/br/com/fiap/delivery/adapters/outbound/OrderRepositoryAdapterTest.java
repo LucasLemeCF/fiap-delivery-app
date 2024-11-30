@@ -57,4 +57,27 @@ public class OrderRepositoryAdapterTest {
 
         verify(orderRepository).findById(orderId);
     }
+
+    @Test
+    void testUpdateSuccess() {
+        Long orderId = 1L;
+        String initialCustomerName = "Old Customer";
+        String updatedCustomerName = "Updated Customer";
+        BigDecimal initialPrice = BigDecimal.ZERO;
+        BigDecimal updatedPrice = BigDecimal.valueOf(100.00);
+        OrderStatus initialStatus = OrderStatus.RECEIVED;
+        OrderStatus updatedStatus = OrderStatus.WAITING_PAYMENT;
+
+        LocalDateTime creationAt = LocalDateTime.now();
+
+        OrderDomain initialOrder = new OrderDomain(orderId, initialCustomerName, creationAt, initialPrice, initialStatus);
+        OrderEntity initialEntity = new OrderEntity(orderId, initialCustomerName, creationAt, initialPrice, initialStatus);
+        OrderEntity updatedEntity = new OrderEntity(orderId, updatedCustomerName, creationAt, updatedPrice, updatedStatus);
+
+        when(orderRepository.save(initialEntity)).thenReturn(updatedEntity);
+
+        orderRepositoryAdapter.update(initialOrder);
+
+        verify(orderRepository).save(initialEntity);
+    }
 }
