@@ -70,3 +70,13 @@ tasks.jacocoTestReport {
 		html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
 	}
 }
+
+tasks.withType<JacocoReport> {
+	afterEvaluate {
+		classDirectories.setFrom(classDirectories.files.map {
+			fileTree(it).matching {
+				exclude("**/delivery/infra/entities/**")
+			}
+		})
+	}
+}
