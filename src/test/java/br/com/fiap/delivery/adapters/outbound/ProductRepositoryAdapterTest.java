@@ -82,10 +82,6 @@ public class ProductRepositoryAdapterTest {
         ProductDomain createdProduct = adapter.create(newProduct);
 
         assertNotNull(createdProduct);
-//        assertEquals(expectedId, createdProduct.getId());
-//        assertEquals(expectedName, createdProduct.getName());
-//
-//        verify(productRepository).save(expectedEntity);
     }
 
 }
