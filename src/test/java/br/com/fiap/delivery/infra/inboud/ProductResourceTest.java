@@ -37,7 +37,7 @@ public class ProductResourceTest {
                 "Product Name", "Product Description", BigDecimal.TEN, new CategoryForm("Category")
         );
         ProductDomain expectedProduct = new ProductDomain(
-                null, "Product Name", "Product Description", BigDecimal.TEN, new CategoryDomain(null, "Category"), true
+                null, "Product Nam", "Product Description", BigDecimal.TEN, new CategoryDomain(null, "Category"), true
         );
 
         when(productPort.create(expectedProduct)).thenReturn(expectedProduct);
