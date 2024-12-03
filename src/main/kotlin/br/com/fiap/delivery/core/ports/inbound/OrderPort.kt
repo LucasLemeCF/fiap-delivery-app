@@ -9,6 +9,8 @@ interface OrderPort {
     fun createOrder(orderFlatDomain: OrderFlatDomain): OrderDomain
     fun getOrderBy(id: Long): CompleteOrderDomain
     fun searchOrder(id: Long): OrderDomain
+    fun searchOrderBy(paymentCode: String): OrderDomain
     fun updateOrder(orderDomain: OrderDomain): OrderDomain
+    fun finalizeOrder(id: Long): OrderDomain
 
 }

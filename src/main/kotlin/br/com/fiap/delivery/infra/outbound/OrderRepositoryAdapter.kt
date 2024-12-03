@@ -26,6 +26,12 @@ class OrderRepositoryAdapter(
         }.orElseThrow { throw NotFoundException("not found order id=$id in system!") }
     }
 
+    override fun searchBy(paymentCode: String): OrderDomain {
+        return orderRepository.findByPaymentCode(paymentCode).map {
+            OrderMapper.toDomain(it)
+        }.orElseThrow { throw NotFoundException("not found order with paymentCode=$paymentCode in system!") }
+    }
+
     override fun update(order: OrderDomain): OrderDomain {
         return OrderMapper.toDomain(
             orderRepository.save(

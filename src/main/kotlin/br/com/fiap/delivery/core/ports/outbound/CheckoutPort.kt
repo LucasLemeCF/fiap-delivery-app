@@ -6,6 +6,6 @@ interface CheckoutPort {
 
     fun checkout(
         value: BigDecimal,
-    )
+    ): String
 
 }

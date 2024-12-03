@@ -6,6 +6,7 @@ interface OrderRepositoryPort {
 
     fun createOrder(order: OrderDomain): OrderDomain
     fun searchBy(id: Long): OrderDomain
+    fun searchBy(paymentCode: String): OrderDomain
     fun update(order: OrderDomain): OrderDomain
 
 }

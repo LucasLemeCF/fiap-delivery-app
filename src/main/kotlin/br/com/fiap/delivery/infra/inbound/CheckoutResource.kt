@@ -1,6 +1,7 @@
 package br.com.fiap.delivery.infra.inbound
 
 
+import br.com.fiap.delivery.core.domain.OrderDomain
 import br.com.fiap.delivery.core.ports.inbound.CheckoutPort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,11 +16,9 @@ class CheckoutResource(
 ) {
 
     @PostMapping
-    fun checkout(
-        @RequestParam orderId: Long,
-    ): ResponseEntity<*> {
+    fun confirmCheckout(@RequestParam paymentCode: String): ResponseEntity<OrderDomain> {
         return ResponseEntity.ok(
-            checkoutPort.checkout(orderId)
+            checkoutPort.confirmCheckout(paymentCode)
         )
     }
 

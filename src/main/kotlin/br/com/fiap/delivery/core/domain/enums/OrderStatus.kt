@@ -5,5 +5,8 @@ enum class OrderStatus {
     WAITING_PAYMENT,
     CANCELED,
     IN_PREPARATION,
-    FINISHED,
+    FINISHED;
+
+    fun canFinalize(): Boolean =
+        this == IN_PREPARATION
 }

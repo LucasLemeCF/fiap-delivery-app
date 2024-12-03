@@ -2,6 +2,7 @@ package br.com.fiap.delivery.core.usecases
 
 import br.com.fiap.delivery.core.domain.*
 import br.com.fiap.delivery.core.domain.enums.OrderStatus
+import br.com.fiap.delivery.core.domain.exceptions.InvalidException
 import br.com.fiap.delivery.core.ports.inbound.OrderPort
 import br.com.fiap.delivery.core.ports.inbound.ProductPort
 import br.com.fiap.delivery.core.ports.outbound.CheckoutPort
@@ -19,6 +20,7 @@ class OrderManager(
     val productPort: ProductPort,
     val orderRepositoryPort: OrderRepositoryPort,
     val orderProductRepositoryPort: OrderProductRepositoryPort,
+    val checkoutPort: CheckoutPort,
 ): OrderPort {
 
     @Transactional
@@ -38,8 +40,12 @@ class OrderManager(
 
         calculateAndSaveItems(orderFlatDomain, products, orderDomain)
 
-        orderDomain.updateStatus(OrderStatus.WAITING_PAYMENT)
-        return orderRepositoryPort.createOrder(orderDomain)
+        val savedOrder = orderRepositoryPort.createOrder(orderDomain)
+
+        val paymentCode = checkoutPort.checkout(savedOrder.price)
+        savedOrder.insertPaymentCode(paymentCode)
+
+        return orderRepositoryPort.update(savedOrder)
     }
 
     override fun getOrderBy(id: Long): CompleteOrderDomain {
@@ -58,7 +64,23 @@ class OrderManager(
         return orderRepositoryPort.searchBy(id)
     }
 
+    override fun searchOrderBy(paymentCode: String): OrderDomain {
+        return orderRepositoryPort.searchBy(paymentCode)
+    }
+
     override fun updateOrder(orderDomain: OrderDomain): OrderDomain {
+        return orderRepositoryPort.update(orderDomain)
+    }
+
+    override fun finalizeOrder(id: Long): OrderDomain {
+        val orderDomain = orderRepositoryPort.searchBy(id)
+
+        if(orderDomain.status.canFinalize().not()) {
+            throw InvalidException("Can not finalize the order. Actual status=${orderDomain.status.name}")
+        }
+
+        orderDomain.updateStatus(OrderStatus.FINISHED)
+
         return orderRepositoryPort.update(orderDomain)
     }
 
