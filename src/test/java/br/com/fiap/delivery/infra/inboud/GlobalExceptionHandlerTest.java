@@ -1,8 +1,8 @@
 package br.com.fiap.delivery.infra.inboud;
 
 import br.com.fiap.delivery.core.domain.exceptions.NotFoundException;
-import br.com.fiap.delivery.infra.GlobalException;
-import br.com.fiap.delivery.infra.inbound.GlobalExceptionHandler;
+import br.com.fiap.delivery.infra.support.GlobalException;
+import br.com.fiap.delivery.infra.support.GlobalExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ public class GlobalExceptionHandlerTest {
     private HttpServletRequest request;
 
     @Mock
-    private WebRequest webRequest; // More generic Mock for ExceptionHandler methods
+    private WebRequest webRequest;
 
     @InjectMocks
     private GlobalExceptionHandler handler;

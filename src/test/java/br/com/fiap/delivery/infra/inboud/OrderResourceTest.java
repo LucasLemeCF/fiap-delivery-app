@@ -32,13 +32,14 @@ public class OrderResourceTest {
 
     @Test
     void testCreateOrder_Success() {
+        CustomerDomain customerDomain = new CustomerDomain("Customer Name", "12345678901", "teste@email.com");
         OrderFlatDomain orderFlatDomain = new OrderFlatDomain(
-                "Customer Name",
+                customerDomain,
                 List.of(new ProductFlatDomain("Product 1", 1L))
         );
 
         OrderDomain expectedOrder = new OrderDomain(
-                null, "Customer Name", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED
+                null, "Customer Name", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED, "12345"
         );
 
         when(orderPort.createOrder(orderFlatDomain)).thenReturn(expectedOrder);
@@ -53,7 +54,7 @@ public class OrderResourceTest {
     @Test
     void testGetOrderByIdSuccess() {
         Long orderId = 1L;
-        OrderDomain order = new OrderDomain(orderId, "John Doe", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED);
+        OrderDomain order = new OrderDomain(orderId, "John Doe", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED, "12345");
         List<ProductDomain> products = Collections.emptyList();
         CompleteOrderDomain expectedResponse = new CompleteOrderDomain(order, products);
         when(orderPort.getOrderBy(orderId)).thenReturn(expectedResponse);

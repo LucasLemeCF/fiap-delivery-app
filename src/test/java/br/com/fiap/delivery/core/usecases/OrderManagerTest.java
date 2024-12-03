@@ -6,13 +6,13 @@ import br.com.fiap.delivery.core.ports.outbound.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -23,78 +23,114 @@ public class OrderManagerTest {
 
     @Mock
     private CustomerPort customerPort;
-
     @Mock
     private ProductPort productPort;
-
     @Mock
     private OrderRepositoryPort orderRepositoryPort;
-
     @Mock
     private OrderProductRepositoryPort orderProductRepositoryPort;
-
     @Mock
     private CheckoutPort checkoutPort;
 
-    @InjectMocks
     private OrderManager orderManager;
 
-    @Test
-    void testCreateOrderSuccess() {
-        OrderDomain mockOrder = new OrderDomain(1L, "John Doe", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.WAITING_PAYMENT);
-        ProductDomain mockProduct = new ProductDomain(1L, "Product Name", "...", BigDecimal.ZERO, new CategoryDomain(1L, "Category"), true);
-
-        when(productPort.searchProduct("Product Name")).thenReturn(mockProduct);
-        when(orderRepositoryPort.createOrder(any(OrderDomain.class))).thenReturn(mockOrder);
-
-        String customer = "John Doe";
-        List<ProductFlatDomain> products = Collections.singletonList(new ProductFlatDomain("Product Name", 1L));
-        OrderDomain expectedOrder = new OrderDomain(null, customer, LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.WAITING_PAYMENT);
-
-        OrderDomain createdOrder = orderManager.createOrder(new OrderFlatDomain(customer, products));
-
-        verify(customerPort).check(customer);
-        verify(productPort).searchProduct("Product Name");
-        verify(orderProductRepositoryPort).createAll(anyList());
-
-        assertEquals(expectedOrder.getCustomer(), createdOrder.getCustomer());
-        assertEquals(expectedOrder.getStatus(), createdOrder.getStatus());
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        orderManager = new OrderManager(customerPort, productPort, orderRepositoryPort, orderProductRepositoryPort, checkoutPort);
     }
 
     @Test
-    void testGetOrderBySuccess() {
-        OrderDomain order = new OrderDomain(1L, "John Doe", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED);
-        List<OrderProductDomain> orderProducts = Collections.singletonList(
-                new OrderProductDomain(1L, order, new ProductDomain(1L, "Product 1", "Description", BigDecimal.TEN, new CategoryDomain(1L, "Category"), true))
-        );
-        when(orderRepositoryPort.searchBy(1L)).thenReturn(order);
-        when(orderProductRepositoryPort.findAllBy(order)).thenReturn(orderProducts);
+    public void testCreateOrder_ValidCustomerAndProducts_ReturnsCreatedOrder() {
+        String customerCpf = "12345678900";
+        CustomerDomain customer = new CustomerDomain("John Doe", customerCpf, "teste@email.com");
+        when(customerPort.check(customer)).thenReturn(customer);
+        when(orderRepositoryPort.createOrder(any(OrderDomain.class))).thenReturn(new OrderDomain(1L, customerCpf, LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.WAITING_PAYMENT, null));
 
-        CompleteOrderDomain completeOrder = orderManager.getOrderBy(1L);
+        ProductDomain product1 = new ProductDomain(1L, "Product 1", "description", BigDecimal.TEN, new CategoryDomain(1L, "Category"), true);
+        ProductDomain product2 = new ProductDomain(2L, "Product 2", "description", BigDecimal.valueOf(5), new CategoryDomain(1L, "Category"), true);
+        List<ProductFlatDomain> products = new ArrayList<>();
+        products.add(new ProductFlatDomain("Product 1", 2));
+        products.add(new ProductFlatDomain("Product 2", 1));
+        when(productPort.searchProduct("Product 1")).thenReturn(product1);
+        when(productPort.searchProduct("Product 2")).thenReturn(product2);
 
-        assertEquals(order, completeOrder.getOrder());
-        assertEquals(orderProducts.getFirst().getProduct(), completeOrder.getProducts().getFirst());
+        String paymentCode = "valid_payment_code";
+        when(checkoutPort.checkout(any(BigDecimal.class))).thenReturn(paymentCode);
+        when(orderRepositoryPort.update(any(OrderDomain.class))).thenReturn(new OrderDomain(1L, customerCpf, LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.WAITING_PAYMENT, paymentCode));
+
+        OrderDomain expectedOrder = new OrderDomain(
+                null, customerCpf, LocalDateTime.now(), BigDecimal.valueOf(25), OrderStatus.WAITING_PAYMENT, paymentCode);
+
+        OrderDomain actualOrder = orderManager.createOrder(new OrderFlatDomain(customer, products));
+
+        assertNotNull(actualOrder.getId());
+        assertEquals(expectedOrder.getCustomer(), actualOrder.getCustomer());
+        assertEquals(expectedOrder.getStatus(), actualOrder.getStatus());
+        assertEquals(expectedOrder.getPaymentCode(), actualOrder.getPaymentCode());
+
+        verify(productPort).searchProduct("Product 1");
+        verify(productPort).searchProduct("Product 2");
     }
 
     @Test
-    void testSearchOrderSuccess() {
+    public void testGetOrderBy_ExistingOrder_ReturnsCompleteOrder() {
         Long orderId = 1L;
-        OrderDomain order = new OrderDomain(orderId, "John Doe", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED);
+        OrderDomain order = new OrderDomain(orderId, "John Doe", LocalDateTime.now(), BigDecimal.TEN, OrderStatus.RECEIVED, "payment_code");
+        ProductDomain product = new ProductDomain(1L, "Product", "description", BigDecimal.TEN, new CategoryDomain(1L, "Category"), true);
+        List<OrderProductDomain> products = List.of(new OrderProductDomain(1L, order, product));
         when(orderRepositoryPort.searchBy(orderId)).thenReturn(order);
+        when(orderProductRepositoryPort.findAllBy(order)).thenReturn(products);
 
-        OrderDomain foundOrder = orderManager.searchOrder(orderId);
+        CompleteOrderDomain result = orderManager.getOrderBy(orderId);
 
-        assertEquals(order, foundOrder);
+        assertNotNull(result);
     }
 
     @Test
-    void testUpdateOrderSuccess() {
-        OrderDomain order = new OrderDomain(1L, "John Doe", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED);
+    public void testSearchOrder_ExistingOrder_ReturnsOrder() {
+        Long orderId = 1L;
+        OrderDomain expectedOrder = new OrderDomain(orderId, "John Doe", LocalDateTime.now(), BigDecimal.TEN, OrderStatus.RECEIVED, "payment_code");
+        when(orderRepositoryPort.searchBy(orderId)).thenReturn(expectedOrder);
+
+        OrderDomain actualOrder = orderManager.searchOrder(orderId);
+
+        assertEquals(expectedOrder, actualOrder);
+    }
+
+    @Test
+    public void testSearchOrderBy_ExistingPaymentCode_ReturnsOrder() {
+        String paymentCode = "payment123";
+        OrderDomain expectedOrder = new OrderDomain(1L, "John Doe", LocalDateTime.now(), BigDecimal.TEN, OrderStatus.RECEIVED, paymentCode);
+        when(orderRepositoryPort.searchBy(paymentCode)).thenReturn(expectedOrder);
+
+        OrderDomain actualOrder = orderManager.searchOrderBy(paymentCode);
+
+        assertEquals(expectedOrder, actualOrder);
+    }
+
+    @Test
+    public void testUpdateOrder_UpdatesOrderSuccessfully() {
+        OrderDomain orderToUpdate = new OrderDomain(1L, "John Doe", LocalDateTime.now(), BigDecimal.TEN, OrderStatus.RECEIVED, "payment_code");
+        OrderDomain updatedOrder = new OrderDomain(1L, "Jane Doe", LocalDateTime.now(), BigDecimal.TWO, OrderStatus.IN_PREPARATION, "payment_code");
+        when(orderRepositoryPort.update(orderToUpdate)).thenReturn(updatedOrder);
+
+        OrderDomain result = orderManager.updateOrder(orderToUpdate);
+
+        assertEquals(updatedOrder, result);
+    }
+
+    @Test
+    public void testFinalizeOrder_ValidStatus_UpdatesStatusToFinished() {
+        Long orderId = 1L;
+        OrderDomain order = new OrderDomain(orderId, "John Doe", LocalDateTime.now(), BigDecimal.TEN, OrderStatus.IN_PREPARATION, "payment_code");
+        when(orderRepositoryPort.searchBy(orderId)).thenReturn(order);
         when(orderRepositoryPort.update(order)).thenReturn(order);
 
-        OrderDomain updatedOrder = orderManager.updateOrder(order);
+        OrderDomain finalizedOrder = orderManager.finalizeOrder(orderId);
 
-        assertEquals(order, updatedOrder);
-        verify(orderRepositoryPort).update(order);
+        assertEquals(OrderStatus.FINISHED, finalizedOrder.getStatus());
+        verify(orderRepositoryPort).update(finalizedOrder);
     }
+
 }

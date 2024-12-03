@@ -3,7 +3,8 @@ package br.com.fiap.delivery.adapters.outbound;
 import br.com.fiap.delivery.core.domain.OrderDomain;
 import br.com.fiap.delivery.core.domain.enums.OrderStatus;
 import br.com.fiap.delivery.infra.entities.OrderEntity;
-import br.com.fiap.delivery.infra.repositories.OrderRepository;
+import br.com.fiap.delivery.infra.outbound.OrderRepositoryAdapter;
+import br.com.fiap.delivery.infra.outbound.repositories.OrderRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,8 +37,8 @@ public class OrderRepositoryAdapterTest {
 
         LocalDateTime creationAt = LocalDateTime.now(); // Capture the actual time
 
-        OrderDomain order = new OrderDomain(orderId, customerName, creationAt, price, status);
-        OrderEntity expectedEntity = new OrderEntity(orderId, customerName, creationAt, price, status);
+        OrderDomain order = new OrderDomain(orderId, customerName, creationAt, price, status, "12345");
+        OrderEntity expectedEntity = new OrderEntity(orderId, customerName, creationAt, price, status, "12345");
 
         when(orderRepository.save(expectedEntity)).thenReturn(expectedEntity);
 
@@ -49,13 +50,26 @@ public class OrderRepositoryAdapterTest {
     @Test
     void testSearchBySuccess() {
         Long orderId = 1L;
-        OrderEntity expectedEntity = new OrderEntity(orderId, "Test Customer", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED);
+        OrderEntity expectedEntity = new OrderEntity(orderId, "Test Customer", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED, "12345");
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(expectedEntity));
 
         orderRepositoryAdapter.searchBy(orderId);
 
         verify(orderRepository).findById(orderId);
+    }
+
+    @Test
+    void testSearchBySuccessString() {
+        Long orderId = 1L;
+        String paymentCode = "valid_payment_code";
+        OrderEntity expectedEntity = new OrderEntity(orderId, "Test Customer", LocalDateTime.now(), BigDecimal.ZERO, OrderStatus.RECEIVED, paymentCode);
+
+        when(orderRepository.findByPaymentCode(paymentCode)).thenReturn(Optional.of(expectedEntity));
+
+        orderRepositoryAdapter.searchBy(paymentCode);
+
+        verify(orderRepository).findByPaymentCode(paymentCode);
     }
 
     @Test
@@ -70,9 +84,9 @@ public class OrderRepositoryAdapterTest {
 
         LocalDateTime creationAt = LocalDateTime.now();
 
-        OrderDomain initialOrder = new OrderDomain(orderId, initialCustomerName, creationAt, initialPrice, initialStatus);
-        OrderEntity initialEntity = new OrderEntity(orderId, initialCustomerName, creationAt, initialPrice, initialStatus);
-        OrderEntity updatedEntity = new OrderEntity(orderId, updatedCustomerName, creationAt, updatedPrice, updatedStatus);
+        OrderDomain initialOrder = new OrderDomain(orderId, initialCustomerName, creationAt, initialPrice, initialStatus, "12345");
+        OrderEntity initialEntity = new OrderEntity(orderId, initialCustomerName, creationAt, initialPrice, initialStatus, "12345");
+        OrderEntity updatedEntity = new OrderEntity(orderId, updatedCustomerName, creationAt, updatedPrice, updatedStatus, "12345");
 
         when(orderRepository.save(initialEntity)).thenReturn(updatedEntity);
 
