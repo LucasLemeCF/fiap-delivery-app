@@ -11,10 +11,10 @@ import br.com.fiap.delivery.core.ports.outbound.OrderRepositoryPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.util.UUID
 
 @Service
 class OrderManager(
-    val checkoutPort: CheckoutPort,
     val customerPort: CustomerPort,
     val productPort: ProductPort,
     val orderRepositoryPort: OrderRepositoryPort,
@@ -23,15 +23,16 @@ class OrderManager(
 
     @Transactional
     override fun createOrder(orderFlatDomain: OrderFlatDomain): OrderDomain {
-        val customer = orderFlatDomain.customer
-        customerPort.check(customer)
+        val customer = orderFlatDomain.customer?.let {
+            customerPort.check(it)
+        }
 
         val products = checkAndGetProducts(orderFlatDomain.products)
 
         val orderDomain = orderRepositoryPort.createOrder(
             OrderDomain(
                 id = null,
-                customer = customer,
+                customer = customer?.cpf ?: UUID.randomUUID().toString(),
             )
         )
 

@@ -5,8 +5,7 @@ import java.math.BigDecimal
 interface CheckoutPort {
 
     fun checkout(
-        customer: String,
         value: BigDecimal,
-    ): Boolean
+    )
 
 }

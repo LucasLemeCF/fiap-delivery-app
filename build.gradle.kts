@@ -19,7 +19,11 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url = uri("https://repo.spring.io/milestone") }
 }
+
+extra["springCloudVersion"] = "2024.0.0-RC1"
+
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -32,7 +36,15 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-migrationsupport:5.9.2")
 	testImplementation("org.mockito:mockito-core:3.6.28")
 	testImplementation("org.mockito:mockito-junit-jupiter:3.6.28")
+	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 }
+
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+	}
+}
+
 
 kotlin {
 	compilerOptions {

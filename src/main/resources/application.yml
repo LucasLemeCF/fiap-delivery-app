@@ -24,6 +24,20 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: FULL
+
+application:
+  external:
+    url:
+      customer: ${CUSTOMER_API_PATH}
+      checkout: ${CHECKOUT_API_PATH}
+
 ---
 
 spring:

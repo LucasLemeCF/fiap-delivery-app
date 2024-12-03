@@ -1,4 +1,4 @@
-package br.com.fiap.delivery.infra.repositories
+package br.com.fiap.delivery.infra.outbound.repositories
 
 import br.com.fiap.delivery.infra.entities.OrderEntity
 import org.springframework.data.jpa.repository.JpaRepository

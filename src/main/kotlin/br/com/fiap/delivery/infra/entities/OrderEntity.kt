@@ -14,7 +14,7 @@ data class OrderEntity(
     var id: Long?,
 
     @Column(name = "COD_CUSTOMER")
-    val customer: String,
+    val customer: String? = null,
 
     @Column(name = "DAT_CREATION")
     val creationAt: LocalDateTime = LocalDateTime.now(),
@@ -25,6 +25,9 @@ data class OrderEntity(
     @Column(name = "DES_STATUS")
     @Enumerated(EnumType.STRING)
     val status: OrderStatus = OrderStatus.RECEIVED,
+
+    @Column(name = "COD_EXTERNAL_PAYMENT")
+    var paymentCode: String? = null,
 
 ) {
 

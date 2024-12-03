@@ -7,10 +7,11 @@ import java.time.LocalDateTime
 data class OrderDomain(
 
     var id: Long?,
-    val customer: String,
+    val customer: String?,
     val creationAt: LocalDateTime = LocalDateTime.now(),
     var price: BigDecimal = BigDecimal.ZERO,
     var status: OrderStatus = OrderStatus.RECEIVED,
+    var paymentCode: String? = null,
 
 ) {
 
@@ -20,6 +21,10 @@ data class OrderDomain(
 
     fun updateStatus(status: OrderStatus) {
         this.status = status
+    }
+
+    fun insertPaymentCode(code: String) {
+        this.paymentCode = code
     }
 
 }

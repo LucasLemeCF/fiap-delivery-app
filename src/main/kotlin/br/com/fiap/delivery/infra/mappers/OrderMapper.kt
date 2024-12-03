@@ -12,6 +12,7 @@ object OrderMapper {
             creationAt = domain.creationAt,
             value = domain.price,
             status = domain.status,
+            paymentCode = domain.paymentCode,
         )
     }
 
@@ -22,6 +23,7 @@ object OrderMapper {
             creationAt = entity.creationAt,
             price = entity.value,
             status = entity.status,
+            paymentCode = entity.paymentCode,
         )
     }
 

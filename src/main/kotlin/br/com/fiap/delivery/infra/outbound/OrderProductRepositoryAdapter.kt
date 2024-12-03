@@ -1,11 +1,11 @@
-package br.com.fiap.delivery.adapters.outbound
+package br.com.fiap.delivery.infra.outbound
 
 import br.com.fiap.delivery.core.domain.OrderDomain
 import br.com.fiap.delivery.core.domain.OrderProductDomain
 import br.com.fiap.delivery.core.ports.outbound.OrderProductRepositoryPort
 import br.com.fiap.delivery.infra.mappers.OrderMapper
 import br.com.fiap.delivery.infra.mappers.OrderProductMapper
-import br.com.fiap.delivery.infra.repositories.OrderProductRepository
+import br.com.fiap.delivery.infra.outbound.repositories.OrderProductRepository
 import org.springframework.stereotype.Component
 
 @Component

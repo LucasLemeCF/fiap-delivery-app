@@ -1,10 +1,10 @@
-package br.com.fiap.delivery.adapters.outbound
+package br.com.fiap.delivery.infra.outbound
 
 import br.com.fiap.delivery.core.domain.ProductDomain
 import br.com.fiap.delivery.core.domain.exceptions.NotFoundException
 import br.com.fiap.delivery.core.ports.outbound.ProductRepositoryPort
 import br.com.fiap.delivery.infra.mappers.ProductMapper
-import br.com.fiap.delivery.infra.repositories.ProductRepository
+import br.com.fiap.delivery.infra.outbound.repositories.ProductRepository
 import org.springframework.stereotype.Component
 
 @Component

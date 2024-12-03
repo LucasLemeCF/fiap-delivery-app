@@ -1,4 +1,4 @@
-package br.com.fiap.delivery.infra
+package br.com.fiap.delivery.infra.support
 
 data class GlobalException(
     val name: String,

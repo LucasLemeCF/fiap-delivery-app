@@ -14,10 +14,7 @@ class CheckoutManager(
     override fun checkout(orderId: Long) {
         val orderDomain = orderPort.searchOrder(orderId)
 
-        checkoutPort.checkout(
-            customer = orderDomain.customer,
-            value = orderDomain.price,
-        )
+        checkoutPort.checkout(value = orderDomain.price)
 
         orderDomain.updateStatus(OrderStatus.IN_PREPARATION)
         orderPort.updateOrder(orderDomain)
