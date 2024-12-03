@@ -44,6 +44,7 @@ class OrderManager(
 
         val paymentCode = checkoutPort.checkout(savedOrder.price)
         savedOrder.insertPaymentCode(paymentCode)
+        savedOrder.updateStatus(OrderStatus.WAITING_PAYMENT)
 
         return orderRepositoryPort.update(savedOrder)
     }
