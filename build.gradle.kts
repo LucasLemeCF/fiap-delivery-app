@@ -87,7 +87,10 @@ tasks.withType<JacocoReport> {
 	afterEvaluate {
 		classDirectories.setFrom(classDirectories.files.map {
 			fileTree(it).matching {
-				exclude("**/delivery/infra/entities/**")
+				exclude("**/delivery/config/FeignClientConfiguration")
+				exclude("**/delivery/infra/support/**")
+				exclude("**/delivery/infra/outbound/CheckoutAdapter**")
+				exclude("**/delivery/infra/outbound/CustomerAdapter**")
 			}
 		})
 	}

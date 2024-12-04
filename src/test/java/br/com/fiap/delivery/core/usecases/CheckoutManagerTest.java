@@ -3,12 +3,11 @@ package br.com.fiap.delivery.core.usecases;
 import br.com.fiap.delivery.core.domain.OrderDomain;
 import br.com.fiap.delivery.core.domain.enums.OrderStatus;
 import br.com.fiap.delivery.core.ports.inbound.OrderPort;
-import br.com.fiap.delivery.core.ports.outbound.CheckoutPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -21,32 +20,26 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CheckoutManagerTest {
 
     @Mock
-    private CheckoutPort checkoutPort;
-
-    @Mock
     private OrderPort orderPort;
 
-    @InjectMocks
     private CheckoutManager checkoutManager;
-
-    private OrderDomain mockOrder;
 
     @BeforeEach
     public void setUp() {
-        mockOrder = new OrderDomain(1L, "Customer", LocalDateTime.now(), BigDecimal.valueOf(100), OrderStatus.IN_PREPARATION);
-
-        when(orderPort.searchOrder(1L)).thenReturn(mockOrder);
-        when(checkoutPort.checkout("Customer", BigDecimal.valueOf(100))).thenReturn(true);
+        MockitoAnnotations.initMocks(this);
+        checkoutManager = new CheckoutManager(orderPort);
     }
 
     @Test
-    public void testCheckout() {
-        checkoutManager.checkout(1L);
+    public void testConfirmCheckout_ValidPaymentCode_UpdatesOrderStatusAndReturnsOrder() {
+        String paymentCode = "valid_code";
+        OrderDomain expectedOrder = new OrderDomain(1L, "John Doe", LocalDateTime.now(), BigDecimal.TEN, OrderStatus.RECEIVED, paymentCode);
+        when(orderPort.searchOrderBy(paymentCode)).thenReturn(expectedOrder);
+        when(orderPort.updateOrder(expectedOrder)).thenReturn(expectedOrder);
 
-        verify(orderPort, times(1)).searchOrder(1L);
-        verify(checkoutPort, times(1)).checkout("Customer", BigDecimal.valueOf(100));
-        verify(orderPort, times(1)).updateOrder(mockOrder);
+        OrderDomain actualOrder = checkoutManager.confirmCheckout(paymentCode);
 
-        assertEquals(OrderStatus.IN_PREPARATION, mockOrder.getStatus());
+        assertEquals(OrderStatus.IN_PREPARATION, actualOrder.getStatus());
     }
+
 }

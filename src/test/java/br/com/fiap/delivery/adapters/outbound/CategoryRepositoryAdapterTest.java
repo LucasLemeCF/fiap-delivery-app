@@ -2,7 +2,8 @@ package br.com.fiap.delivery.adapters.outbound;
 
 import br.com.fiap.delivery.core.domain.CategoryDomain;
 import br.com.fiap.delivery.infra.entities.CategoryEntity;
-import br.com.fiap.delivery.infra.repositories.CategoryRepository;
+import br.com.fiap.delivery.infra.outbound.CategoryRepositoryAdapter;
+import br.com.fiap.delivery.infra.outbound.repositories.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

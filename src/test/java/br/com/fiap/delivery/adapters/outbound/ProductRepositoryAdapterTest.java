@@ -5,7 +5,8 @@ import br.com.fiap.delivery.core.domain.ProductDomain;
 import br.com.fiap.delivery.core.domain.exceptions.NotFoundException;
 import br.com.fiap.delivery.infra.entities.CategoryEntity;
 import br.com.fiap.delivery.infra.entities.ProductEntity;
-import br.com.fiap.delivery.infra.repositories.ProductRepository;
+import br.com.fiap.delivery.infra.outbound.ProductRepositoryAdapter;
+import br.com.fiap.delivery.infra.outbound.repositories.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,7 +58,6 @@ public class ProductRepositoryAdapterTest {
 
     @Test
     public void testCreateSuccess() {
-        Long expectedId = 1L;
         String expectedName = "Test Product";
         String expectedDescription = "This is a test product";
         BigDecimal expectedValue = BigDecimal.valueOf(10.00);
@@ -82,6 +83,17 @@ public class ProductRepositoryAdapterTest {
         ProductDomain createdProduct = adapter.create(newProduct);
 
         assertNotNull(createdProduct);
+    }
+
+    @Test
+    public void testSearchAll_ReturnsEmptyList_WhenNoProductsFound() {
+        ProductRepositoryAdapter adapter = new ProductRepositoryAdapter(productRepository);
+
+        when(productRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<ProductDomain> products = adapter.searchAll();
+
+        assertEquals(Collections.emptyList(), products);
     }
 
 }

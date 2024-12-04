@@ -1,8 +1,6 @@
 package br.com.fiap.delivery.infra.inboud;
 
-import br.com.fiap.delivery.core.ports.inbound.CategoryPort;
 import br.com.fiap.delivery.core.ports.inbound.CheckoutPort;
-import br.com.fiap.delivery.infra.inbound.CategoryResource;
 import br.com.fiap.delivery.infra.inbound.CheckoutResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,12 +25,12 @@ public class CheckoutResourceTest {
 
     @Test
     void testCheckoutSuccess() {
-        Long orderId = 123L;
+        String orderId = "12345";
 
-        ResponseEntity<?> response = checkoutResource.checkout(orderId);
+        ResponseEntity<?> response = checkoutResource.confirmCheckout(orderId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(checkoutPort).checkout(orderId);
+        verify(checkoutPort).confirmCheckout(orderId);
     }
 
 }
